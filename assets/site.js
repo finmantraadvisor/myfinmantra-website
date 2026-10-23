@@ -152,8 +152,8 @@
     var runPf = function () {
       var basic = parseFloat($("#pf-basic").value) || 0, gross = parseFloat($("#pf-gross").value) || 0;
       var capped = $("#pf-cap").checked;
-      var pfWage = capped ? Math.min(basic, 15000) : basic;
-      var eeP = pfWage * .12, eps = Math.min(basic, 15000) * .0833, epf = pfWage * .12 - eps;
+      var pfWage = capped ? Math.min(basic, 25000) : basic;
+      var eeP = pfWage * .12, eps = Math.min(basic, 25000) * .0833, epf = pfWage * .12 - eps;
       var esiOn = gross > 0 && gross <= 21000;
       var eeE = esiOn ? gross * .0075 : 0, erE = esiOn ? gross * .0325 : 0;
       $("#pf-out").innerHTML = "<dl>" +
