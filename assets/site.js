@@ -168,18 +168,62 @@
     pf.addEventListener("input", runPf); runPf();
   }
 
-  /* ---------- Enquiry form → WhatsApp ---------- */
+  /* ---------- Analytics hook (works once GA4 is added; harmless before) ---------- */
+  var track = function (name, params) {
+    try { if (typeof window.gtag === "function") window.gtag("event", name, params || {}); } catch (e) {}
+  };
+  document.addEventListener("click", function (ev) {
+    var a = ev.target.closest ? ev.target.closest("a") : null;
+    if (!a || !a.href) return;
+    if (a.href.indexOf("wa.me/") > -1) track("whatsapp_click", { link_url: location.pathname });
+    else if (a.href.indexOf("tel:") === 0) track("phone_click", { link_url: location.pathname });
+  });
+
+  /* ---------- Enquiry form → email (FormSubmit) → thank-you page, WhatsApp as fallback ---------- */
+  var FORM_ENDPOINT = "https://formsubmit.co/ajax/connect@myfinmantra.com";
   $$("form[data-enquiry]").forEach(function (f) {
     f.addEventListener("submit", function (ev) {
       ev.preventDefault();
       if ($(".hp input", f) && $(".hp input", f).value) return;
+      var status = $(".form-status", f), btn = $("button[type=submit]", f);
       var v = function (n) { var el = f.elements[n]; return el ? el.value.trim() : ""; };
-      if (!v("name") || !v("phone")) { $(".form-status", f).textContent = "Please add your name and phone number."; return; }
+      if (!v("name") || !v("phone")) { status.textContent = "Please add your name and phone number."; return; }
       var msg = "Hello MyFinMantra, I'd like a consultation.\n\nName: " + v("name") + "\nPhone: " + v("phone") +
         (v("email") ? "\nEmail: " + v("email") : "") + (v("service") ? "\nService: " + v("service") : "") +
         (v("city") ? "\nCity: " + v("city") : "") + (v("message") ? "\n\n" + v("message") : "");
-      $(".form-status", f).textContent = "Opening WhatsApp with your details…";
-      window.open("https://wa.me/" + WA + "?text=" + encodeURIComponent(msg), "_blank", "noopener");
+      var waUrl = "https://wa.me/" + WA + "?text=" + encodeURIComponent(msg);
+      try { sessionStorage.setItem("mfm_wa", waUrl); } catch (e) {}
+      var data = {
+        name: v("name"), phone: v("phone"), email: v("email"), city: v("city"),
+        service: v("service"), message: v("message"),
+        page: location.pathname, source: (location.search || "direct"),
+        _subject: "New enquiry: " + v("service") + " — " + v("name"),
+        _template: "table", _captcha: "false"
+      };
+      if (v("email")) data._replyto = v("email");
+      status.textContent = "Sending your enquiry…";
+      if (btn) btn.disabled = true;
+      var fallback = function () {
+        status.innerHTML = "We couldn't send the form just now. <a href='" + waUrl + "' target='_blank' rel='noopener'>Send it on WhatsApp instead</a> or call +91 97118 99555.";
+        if (btn) btn.disabled = false;
+      };
+      if (!window.fetch) { window.open(waUrl, "_blank", "noopener"); return; }
+      fetch(FORM_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify(data)
+      }).then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { return { ok: r.ok, j: j }; }); })
+        .then(function (res) {
+          if (res.ok && String(res.j.success) !== "false") {
+            track("generate_lead", { service: v("service") });
+            location.href = "thank-you.html";
+          } else { fallback(); }
+        })
+        .catch(fallback);
     });
   });
+
+  /* Thank-you page: offer WhatsApp with the same details */
+  var waBtn = $("[data-wa-followup]");
+  if (waBtn) { try { var u = sessionStorage.getItem("mfm_wa"); if (u) waBtn.href = u; } catch (e) {} }
 })();
