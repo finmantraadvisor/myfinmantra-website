@@ -179,8 +179,9 @@
     else if (a.href.indexOf("tel:") === 0) track("phone_click", { link_url: location.pathname });
   });
 
-  /* ---------- Enquiry form → email (FormSubmit) → thank-you page, WhatsApp as fallback ---------- */
-  var FORM_ENDPOINT = "https://formsubmit.co/ajax/connect@myfinmantra.com";
+  /* ---------- Enquiry form → email (Web3Forms) → thank-you page, WhatsApp as fallback ---------- */
+  var FORM_ENDPOINT = "https://api.web3forms.com/submit";
+  var FORM_KEY = "6073bb4d-3b72-43b1-adf9-d5b1ed296222"; /* public Web3Forms access key */
   $$("form[data-enquiry]").forEach(function (f) {
     f.addEventListener("submit", function (ev) {
       ev.preventDefault();
@@ -194,13 +195,15 @@
       var waUrl = "https://wa.me/" + WA + "?text=" + encodeURIComponent(msg);
       try { sessionStorage.setItem("mfm_wa", waUrl); } catch (e) {}
       var data = {
+        access_key: FORM_KEY,
+        subject: "New enquiry: " + v("service") + " — " + v("name"),
+        from_name: "MyFinMantra website",
         name: v("name"), phone: v("phone"), email: v("email"), city: v("city"),
         service: v("service"), message: v("message"),
         page: location.pathname, source: (location.search || "direct"),
-        _subject: "New enquiry: " + v("service") + " — " + v("name"),
-        _template: "table", _captcha: "false"
+        botcheck: ""
       };
-      if (v("email")) data._replyto = v("email");
+      if (v("email")) data.replyto = v("email");
       status.textContent = "Sending your enquiry…";
       if (btn) btn.disabled = true;
       var fallback = function () {
@@ -214,7 +217,7 @@
         body: JSON.stringify(data)
       }).then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { return { ok: r.ok, j: j }; }); })
         .then(function (res) {
-          if (res.ok && String(res.j.success) !== "false") {
+          if (res.ok && res.j.success === true) {
             track("generate_lead", { service: v("service") });
             location.href = "thank-you.html";
           } else { fallback(); }
