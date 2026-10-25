@@ -180,7 +180,7 @@
   });
 
   /* ---------- Enquiry form → email (FormSubmit) → thank-you page, WhatsApp as fallback ---------- */
-  var FORM_ENDPOINT = "https://formsubmit.co/ajax/connect@myfinmantra.com";
+  var FORM_ENDPOINT = "https://formsubmit.co/ajax/finmantraadvisor@gmail.com";
   $$("form[data-enquiry]").forEach(function (f) {
     f.addEventListener("submit", function (ev) {
       ev.preventDefault();
