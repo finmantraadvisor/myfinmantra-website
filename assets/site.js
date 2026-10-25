@@ -182,6 +182,18 @@
   /* ---------- Enquiry form → email (Web3Forms) → thank-you page, WhatsApp as fallback ---------- */
   var FORM_ENDPOINT = "https://api.web3forms.com/submit";
   var FORM_KEY = "6073bb4d-3b72-43b1-adf9-d5b1ed296222"; /* public Web3Forms access key */
+  /* Google Sheet backup (Apps Script web app in finmantraadvisor@gmail.com) */
+  var SHEET_ENDPOINT = "https://script.google.com/macros/s/AKfycbxXa9_37PJf5LjP4991xqjiO74aNpEo-Wm8oDFnspgC4SxmA0dn5ib_R1OpfVw-vv5_/exec";
+  var saveToSheet = function (d) {
+    try {
+      fetch(SHEET_ENDPOINT, {
+        method: "POST", mode: "no-cors", keepalive: true,
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ name: d.name, phone: d.phone, email: d.email, city: d.city,
+          service: d.service, message: d.message, page: d.page, source: d.source, botcheck: d.botcheck })
+      }).catch(function () {});
+    } catch (e) {}
+  };
   $$("form[data-enquiry]").forEach(function (f) {
     f.addEventListener("submit", function (ev) {
       ev.preventDefault();
@@ -204,6 +216,7 @@
         botcheck: ""
       };
       if (v("email")) data.replyto = v("email");
+      saveToSheet(data);
       status.textContent = "Sending your enquiry…";
       if (btn) btn.disabled = true;
       var fallback = function () {
