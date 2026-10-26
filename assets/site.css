@@ -291,3 +291,8 @@ textarea{min-height:120px;resize:vertical}
 #it-out{overflow-x:auto}
 @media (max-width:520px){.calc{padding:20px}.rates th,.rates td{padding:10px 8px;font-size:.88rem}.ledger li{grid-template-columns:52px 1fr;padding:10px 16px}}
 
+
+/* Free templates */
+.dl-box{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-lg);padding:22px;margin-bottom:8px}
+.tpl-card .tpl-dl{margin-top:14px;font-weight:600;color:var(--ink-3);font-size:.93rem}
+.tpl-card:hover .tpl-dl{text-decoration:underline}
