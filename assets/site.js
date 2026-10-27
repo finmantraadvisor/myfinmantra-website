@@ -168,78 +168,91 @@
     pf.addEventListener("input", runPf); runPf();
   }
 
-  /* ---------- Analytics hook (works once GA4 is added; harmless before) ---------- */
-  var track = function (name, params) {
-    try { if (typeof window.gtag === "function") window.gtag("event", name, params || {}); } catch (e) {}
-  };
-  document.addEventListener("click", function (ev) {
-    var a = ev.target.closest ? ev.target.closest("a") : null;
-    if (!a || !a.href) return;
-    if (a.href.indexOf("wa.me/") > -1) track("whatsapp_click", { link_url: location.pathname });
-    else if (a.href.indexOf("tel:") === 0) track("phone_click", { link_url: location.pathname });
-  });
 
-  /* ---------- Enquiry form → email (Web3Forms) → thank-you page, WhatsApp as fallback ---------- */
-  var FORM_ENDPOINT = "https://api.web3forms.com/submit";
-  var FORM_KEY = "6073bb4d-3b72-43b1-adf9-d5b1ed296222"; /* public Web3Forms access key */
-  /* Google Sheet backup (Apps Script web app in finmantraadvisor@gmail.com) */
-  var SHEET_ENDPOINT = "https://script.google.com/macros/s/AKfycbxXa9_37PJf5LjP4991xqjiO74aNpEo-Wm8oDFnspgC4SxmA0dn5ib_R1OpfVw-vv5_/exec";
-  var saveToSheet = function (d) {
-    try {
-      fetch(SHEET_ENDPOINT, {
-        method: "POST", mode: "no-cors", keepalive: true,
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({ name: d.name, phone: d.phone, email: d.email, city: d.city,
-          service: d.service, message: d.message, page: d.page, source: d.source, botcheck: d.botcheck })
-      }).catch(function () {});
-    } catch (e) {}
-  };
+  /* ---------- TDS calculator (Income-tax Act, 2025) ---------- */
+  var tdsData = document.getElementById("tds-data");
+  if (tdsData) {
+    var RATES = JSON.parse(tdsData.textContent);
+    var sel = $("#tds-nature");
+    RATES.forEach(function (r, i) { var o = document.createElement("option"); o.value = i; o.textContent = r[0] + " (old " + r[1] + ")"; sel.appendChild(o); });
+    var thrText = function (r) {
+      if (r[4] === "NONE") return "No threshold";
+      if (r[4] === "PER") return "Above " + inr(r[5]) + " per payment / month";
+      if (r[4] === "EXCESS") return "Only on the amount above " + inr(r[6]) + " a year";
+      if (r[4] === "SA") return "Above " + inr(r[5]) + " per payment, or " + inr(r[6]) + " a year";
+      return "Above " + inr(r[6]) + " a year (then on the whole amount)";
+    };
+    var dueDate = function (d, r) {
+      if (!d) return "";
+      var x = r[3] === "Form 141" ? new Date(d.getFullYear(), d.getMonth() + 1, 30) : (d.getMonth() === 2 ? new Date(d.getFullYear(), 3, 30) : new Date(d.getFullYear(), d.getMonth() + 1, 7));
+      return x.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+    };
+    var runTds = function () {
+      var r = RATES[+sel.value];
+      var amt = parseFloat($("#tds-amt").value) || 0, prior = parseFloat($("#tds-prior").value) || 0;
+      var type = $("#tds-type").value, pan = $("input[name=tds-pan]:checked").value === "yes";
+      var base;
+      if (r[4] === "NONE") base = amt;
+      else if (r[4] === "PER") base = amt > r[5] ? amt : 0;
+      else if (r[4] === "EXCESS") base = Math.max(0, prior + amt - r[6]) - Math.max(0, prior - r[6]);
+      else if (r[4] === "SA") base = (prior + amt > r[6]) ? amt + prior : (amt > r[5] ? amt : 0);
+      else base = (prior + amt > r[6]) ? amt + prior : 0;
+      var rate = type === "ind" ? r[7] : (type === "co" ? r[8] : r[9]);
+      if (!pan) rate = r[1] === "194Q" ? 0.05 : Math.max(0.2, rate);
+      var tds = Math.round(base * rate);
+      var dv = $("#tds-date").value ? new Date($("#tds-date").value) : null;
+      $("#tds-out").innerHTML = "<dl>" +
+        "<dt>Section — Income-tax Act, 2025</dt><dd>" + r[2] + "</dd>" +
+        "<dt>Old section (1961 Act)</dt><dd>" + r[1] + "</dd>" +
+        "<dt>Payment code</dt><dd>" + r[3] + "</dd>" +
+        "<dt>Threshold</dt><dd style='text-align:right'>" + thrText(r) + "</dd>" +
+        "<dt>Amount liable to TDS</dt><dd>" + inr(base) + "</dd>" +
+        "<dt>Rate" + (pan ? "" : " (no PAN)") + "</dt><dd>" + (rate * 100).toFixed(rate < 0.01 ? 1 : 0) + "%</dd>" +
+        "<dt class='total'>TDS to deduct</dt><dd class='total'>" + inr(tds) + "</dd>" +
+        (dv ? "<dt>Deposit by (if deducted on this date)</dt><dd>" + dueDate(dv, r) + "</dd>" : "") + "</dl>" +
+        (r[10] ? "<p class='small muted' style='margin:10px 0 0'>" + r[10] + ".</p>" : "") +
+        (prior > 0 && (r[4] === "AGG" || r[4] === "SA") && base > amt ? "<p class='small muted' style='margin:10px 0 0'>Includes earlier payments of " + inr(prior) + " because the yearly limit was crossed. Reduce 'Paid earlier' by amounts on which TDS was already deducted.</p>" : "");
+    };
+    $("#tds-form").addEventListener("input", runTds); runTds();
+  }
+
+  /* ---------- TDS interest & late fee ---------- */
+  var ti = $("#tdsi-form");
+  if (ti) {
+    var months = function (s, e) { return (e.getFullYear() - s.getFullYear()) * 12 + e.getMonth() - s.getMonth() + 1; };
+    var D = function (id) { var v = $(id).value; return v ? new Date(v + "T00:00:00") : null; };
+    var runTi = function () {
+      var tds = parseFloat($("#tdsi-amt").value) || 0;
+      var dd = D("#tdsi-due"), ded = D("#tdsi-ded"), paid = D("#tdsi-paid"), sdue = D("#tdsi-sdue"), sfil = D("#tdsi-sfil");
+      var m1 = (dd && ded && ded > dd) ? months(dd, ded) : 0;
+      var payDue = ded ? (ded.getMonth() === 2 ? new Date(ded.getFullYear(), 3, 30) : new Date(ded.getFullYear(), ded.getMonth() + 1, 7)) : null;
+      var m2 = (ded && paid && paid > payDue) ? months(ded, paid) : 0;
+      var i1 = Math.round(tds * 0.01 * m1), i2 = Math.round(tds * 0.015 * m2);
+      var days = (sdue && sfil && sfil > sdue) ? Math.round((sfil - sdue) / 864e5) : 0;
+      var fee = Math.min(days * 200, parseFloat($("#tdsi-qtds").value) || tds);
+      $("#tdsi-out").innerHTML = "<dl>" +
+        "<dt>Late deduction: " + m1 + " month" + (m1 === 1 ? "" : "s") + " × 1%</dt><dd>" + inr(i1) + "</dd>" +
+        "<dt>Deposit was due by</dt><dd>" + (payDue ? payDue.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "—") + "</dd>" +
+        "<dt>Late payment: " + m2 + " month" + (m2 === 1 ? "" : "s") + " × 1.5%</dt><dd>" + inr(i2) + "</dd>" +
+        "<dt class='total'>Total interest (section 398)</dt><dd class='total'>" + inr(i1 + i2) + "</dd>" +
+        "<dt>Statement filed " + days + " day" + (days === 1 ? "" : "s") + " late</dt><dd></dd>" +
+        "<dt class='total'>Late fee (section 427)</dt><dd class='total'>" + inr(fee) + "</dd></dl>";
+    };
+    ti.addEventListener("input", runTi); runTi();
+  }
+
+  /* ---------- Enquiry form → WhatsApp ---------- */
   $$("form[data-enquiry]").forEach(function (f) {
     f.addEventListener("submit", function (ev) {
       ev.preventDefault();
       if ($(".hp input", f) && $(".hp input", f).value) return;
-      var status = $(".form-status", f), btn = $("button[type=submit]", f);
       var v = function (n) { var el = f.elements[n]; return el ? el.value.trim() : ""; };
-      if (!v("name") || !v("phone")) { status.textContent = "Please add your name and phone number."; return; }
+      if (!v("name") || !v("phone")) { $(".form-status", f).textContent = "Please add your name and phone number."; return; }
       var msg = "Hello MyFinMantra, I'd like a consultation.\n\nName: " + v("name") + "\nPhone: " + v("phone") +
         (v("email") ? "\nEmail: " + v("email") : "") + (v("service") ? "\nService: " + v("service") : "") +
         (v("city") ? "\nCity: " + v("city") : "") + (v("message") ? "\n\n" + v("message") : "");
-      var waUrl = "https://wa.me/" + WA + "?text=" + encodeURIComponent(msg);
-      try { sessionStorage.setItem("mfm_wa", waUrl); } catch (e) {}
-      var data = {
-        access_key: FORM_KEY,
-        subject: "New enquiry: " + v("service") + " — " + v("name"),
-        from_name: "MyFinMantra website",
-        name: v("name"), phone: v("phone"), email: v("email"), city: v("city"),
-        service: v("service"), message: v("message"),
-        page: location.pathname, source: (location.search || "direct"),
-        botcheck: ""
-      };
-      if (v("email")) data.replyto = v("email");
-      saveToSheet(data);
-      status.textContent = "Sending your enquiry…";
-      if (btn) btn.disabled = true;
-      var fallback = function () {
-        status.innerHTML = "We couldn't send the form just now. <a href='" + waUrl + "' target='_blank' rel='noopener'>Send it on WhatsApp instead</a> or call +91 97118 99555.";
-        if (btn) btn.disabled = false;
-      };
-      if (!window.fetch) { window.open(waUrl, "_blank", "noopener"); return; }
-      fetch(FORM_ENDPOINT, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Accept": "application/json" },
-        body: JSON.stringify(data)
-      }).then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { return { ok: r.ok, j: j }; }); })
-        .then(function (res) {
-          if (res.ok && res.j.success === true) {
-            track("generate_lead", { service: v("service") });
-            location.href = "thank-you.html";
-          } else { fallback(); }
-        })
-        .catch(fallback);
+      $(".form-status", f).textContent = "Opening WhatsApp with your details…";
+      window.open("https://wa.me/" + WA + "?text=" + encodeURIComponent(msg), "_blank", "noopener");
     });
   });
-
-  /* Thank-you page: offer WhatsApp with the same details */
-  var waBtn = $("[data-wa-followup]");
-  if (waBtn) { try { var u = sessionStorage.getItem("mfm_wa"); if (u) waBtn.href = u; } catch (e) {} }
 })();
