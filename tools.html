@@ -1,11 +1,11 @@
 <!doctype html>
 <html lang="en-IN"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Free GST, Income Tax, EMI and PF Calculators | MyFinMantra</title>
-<meta name="description" content="Free calculators: GST (5%, 18%, 40%), income tax new vs old regime for Tax Year 2026-27, loan EMI, and PF &amp; ESI contributions.">
+<title>Free GST, Income Tax, TDS, EMI and PF Calculators | MyFinMantra</title>
+<meta name="description" content="Free calculators: GST (5%, 18%, 40%), income tax new vs old regime, section-wise TDS and TDS interest under the Income-tax Act 2025, loan EMI, and PF &amp; ESI.">
 <link rel="canonical" href="https://www.myfinmantra.com/tools.html">
 <meta property="og:type" content="website"><meta property="og:site_name" content="MyFinMantra">
-<meta property="og:title" content="Free GST, Income Tax, EMI and PF Calculators | MyFinMantra"><meta property="og:description" content="Free calculators: GST (5%, 18%, 40%), income tax new vs old regime for Tax Year 2026-27, loan EMI, and PF &amp; ESI contributions.">
+<meta property="og:title" content="Free GST, Income Tax, TDS, EMI and PF Calculators | MyFinMantra"><meta property="og:description" content="Free calculators: GST (5%, 18%, 40%), income tax new vs old regime, section-wise TDS and TDS interest under the Income-tax Act 2025, loan EMI, and PF &amp; ESI.">
 <meta property="og:url" content="https://www.myfinmantra.com/tools.html"><meta property="og:image" content="https://www.myfinmantra.com/assets/og-image.png"><meta property="og:locale" content="en_IN">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#0F2E35">
@@ -23,9 +23,9 @@
 <div class="nav-cta"><a class="btn btn-primary" href="contact.html">Book a free call</a></div>
 </div></header>
 <main id="main">
-<section class="page-hero"><div class="wrap"><p class="crumbs"><a href="index.html">Home</a> / Free tools</p><h1>Free tools & calculators</h1><p class="lead">Quick estimates for GST, income tax, loan EMIs and payroll contributions. Updated for Tax Year 2026-27 and the GST rates in force since 22 September 2025.</p></div></section>
+<section class="page-hero"><div class="wrap"><p class="crumbs"><a href="index.html">Home</a> / Free tools</p><h1>Free tools & calculators</h1><p class="lead">Quick estimates for GST, income tax, TDS, loan EMIs and payroll contributions. Updated for Tax Year 2026-27 and the GST rates in force since 22 September 2025.</p></div></section>
 <section><div class="wrap">
-<div class="tool-nav" style="margin:0 0 30px"><a href="#gst">GST calculator</a><a href="#income-tax">Income tax: new vs old regime</a><a href="#emi">Loan EMI</a><a href="#pf-esi">PF & ESI</a></div>
+<div class="tool-nav" style="margin:0 0 30px"><a href="#gst">GST calculator</a><a href="#income-tax">Income tax: new vs old regime</a><a href="#emi">Loan EMI</a><a href="#pf-esi">PF & ESI</a><a href="#tds">TDS (new Act)</a><a href="#tds-interest">TDS interest & late fee</a></div>
 <div class="grid" style="gap:30px">
 
 <div class="calc" id="gst"><h2>GST calculator</h2><div class="calc-grid">
@@ -67,6 +67,37 @@
 <div class="field"><label class="check"><input id="pf-cap" type="checkbox" checked> Restrict PF to the ₹25,000 wage ceiling</label></div>
 </form>
 <div><div class="result" id="pf-out" aria-live="polite"></div><p class="small muted" style="margin-top:12px">Excludes EPF admin and EDLI charges. Pension (EPS) is calculated on wages up to the ₹25,000 ceiling, in force from 17 September 2026 (earlier ₹15,000).</p></div>
+</div></div>
+
+<div class="calc" id="tds"><h2>TDS calculator — Income-tax Act, 2025</h2>
+<p class="muted">Section-wise TDS on payments to residents for Tax Year 2026-27, with the new section 393 reference and the old section alongside.</p>
+<script type="application/json" id="tds-data">[["Contractor / sub-contractor payments", "194C", "393(1) Table Sl. 6(i)", "1023 / 1024", "SA", 30000, 100000, 0.01, 0.02, 0.02, ""], ["Professional fees, royalty, non-compete fees", "194J(b)", "393(1) Table Sl. 6(iii)", "1027", "AGG", 0, 50000, 0.1, 0.1, 0.1, ""], ["Fees for technical services, call-centre, film royalty", "194J(a)", "393(1) Table Sl. 6(iii)", "1026", "AGG", 0, 50000, 0.02, 0.02, 0.02, ""], ["Director's fees (not salary)", "194J", "393(1) Table Sl. 6(iii)", "1028", "NONE", 0, 0, 0.1, 0.1, 0.1, ""], ["Commission or brokerage", "194H", "393(1) Table Sl. 1(ii)", "1006", "AGG", 0, 20000, 0.02, 0.02, 0.02, ""], ["Insurance commission", "194D", "393(1) Table Sl. 1(i)", "1005", "AGG", 0, 20000, 0.02, 0.1, 0.02, "10% if the payee is a company"], ["Rent — plant, machinery, equipment", "194-I(a)", "393(1) Table Sl. 2(ii)", "1008", "PER", 50000, 0, 0.02, 0.02, 0.02, "Threshold is per month"], ["Rent — land, building, furniture", "194-I(b)", "393(1) Table Sl. 2(ii)", "1009", "PER", 50000, 0, 0.1, 0.1, 0.1, "Threshold is per month"], ["Rent paid by individual / HUF (not under audit)", "194-IB", "393(1) Table Sl. 2(i)", "Form 141", "PER", 50000, 0, 0.02, 0.02, 0.02, "Threshold is per month; deposit via Form 141"], ["Interest — bank / post office deposits (senior citizen)", "194A", "393(1) Table Sl. 5(ii)", "1020", "AGG", 0, 100000, 0.1, 0.1, 0.1, ""], ["Interest — bank / post office deposits (others)", "194A", "393(1) Table Sl. 5(ii)", "1021", "AGG", 0, 50000, 0.1, 0.1, 0.1, ""], ["Interest — other than banks (loans, deposits)", "194A", "393(1) Table Sl. 5(iii)", "1022", "AGG", 0, 10000, 0.1, 0.1, 0.1, ""], ["Dividend", "194", "393(1) Table Sl. 7", "1029", "AGG", 0, 10000, 0.1, 0.1, 0.1, ""], ["Income from mutual fund units", "194K", "393(1) Table Sl. 4(i)", "1013", "AGG", 0, 10000, 0.1, 0.1, 0.1, ""], ["Purchase of goods (buyer turnover > ₹10 crore)", "194Q", "393(1) Table Sl. 8(ii)", "1031", "EXCESS", 0, 5000000, 0.001, 0.001, 0.001, "Only on purchases above ₹50 lakh from a seller in the year; 5% if no PAN"], ["Purchase of immovable property (₹50 lakh or more)", "194-IA", "393(1) Table Sl. 3(i)", "1011", "PER", 4999999, 0, 0.01, 0.01, 0.01, "On higher of price and stamp duty value"], ["Work / professional fees paid by individual / HUF", "194M", "393(1) Table Sl. 6(ii)", "Form 141", "AGG", 0, 5000000, 0.02, 0.02, 0.02, "Deposit via Form 141"], ["E-commerce operator — sales of participants", "194-O", "393(1) Table Sl. 8(v)", "1035", "NONE", 0, 0, 0.001, 0.001, 0.001, "Individual / HUF sellers with sales up to ₹5 lakh excluded"], ["Benefit or perquisite of business", "194R", "393(1) Table Sl. 8(iv)", "1033", "AGG", 0, 20000, 0.1, 0.1, 0.1, ""], ["Transfer of virtual digital asset", "194S", "393(1) Table Sl. 8(vi)", "1037", "NONE", 0, 0, 0.01, 0.01, 0.01, "Small-value exemptions apply"], ["Life insurance payout (income portion)", "194DA", "393(1) Table Sl. 8(i)", "1030", "AGG", 0, 100000, 0.02, 0.02, 0.02, ""], ["Lottery, online games, crossword winnings", "194B", "393(3) Table Sl. 1", "1058", "PER", 10000, 0, 0.3, 0.3, 0.3, "Per transaction"], ["Commission on sale of lottery tickets", "194G", "393(3) Table Sl. 4", "1063", "AGG", 0, 20000, 0.02, 0.02, 0.02, ""], ["Cash withdrawal from bank (above ₹1 crore)", "194N", "393(3) Table Sl. 5", "1065", "EXCESS", 0, 10000000, 0.02, 0.02, 0.02, "Higher limits for co-operative societies"], ["Partner's salary, commission, interest (by firm)", "194T", "393(3) Table Sl. 7", "1067", "AGG", 0, 20000, 0.1, 0.1, 0.1, ""]]</script>
+<div class="calc-grid">
+<form id="tds-form" onsubmit="return false">
+<div class="field"><label for="tds-nature">Nature of payment</label><select id="tds-nature"></select></div>
+<div class="field"><label for="tds-type">Payee type</label><select id="tds-type"><option value="ind">Individual / HUF</option><option value="co">Company</option><option value="oth" selected>Firm / LLP / others</option></select></div>
+<div class="field"><fieldset><legend>Has the payee given a PAN?</legend><div class="seg"><label><input type="radio" name="tds-pan" value="yes" id="tds-pan-yes" checked> Yes</label><label><input type="radio" name="tds-pan" value="no" id="tds-pan-no"> No</label></div></fieldset></div>
+<div class="field"><label for="tds-amt">Amount of this payment / credit (₹)</label><input id="tds-amt" type="number" inputmode="decimal" min="0" value="45000"></div>
+<div class="field"><label for="tds-prior">Paid earlier this year to the same payee, without TDS (₹)</label><input id="tds-prior" type="number" inputmode="decimal" min="0" value="70000"></div>
+<div class="field"><label for="tds-date">Date of payment or credit (optional)</label><input id="tds-date" type="date"></div>
+</form>
+<div><div class="result" id="tds-out" aria-live="polite"></div><p class="small muted" style="margin-top:12px">Payments to residents only. Salary TDS (section 392) is in our <a href="templates/payroll-calculator-excel.html">payroll calculator</a>. Verify section references with the Act and Rules.</p></div>
+</div></div>
+
+<div class="calc" id="tds-interest"><h2>TDS interest & late fee calculator</h2>
+<p class="muted">Interest under section 398 (1% a month for late deduction, 1.5% a month for late payment) and late fee under section 427 (₹200 a day).</p>
+<div class="calc-grid">
+<form id="tdsi-form" onsubmit="return false">
+<div class="field"><label for="tdsi-amt">TDS amount (₹)</label><input id="tdsi-amt" type="number" inputmode="decimal" min="0" value="10000"></div>
+<div class="field"><label for="tdsi-due">Date TDS was deductible (payment / credit date)</label><input id="tdsi-due" type="date" value="2026-07-15"></div>
+<div class="field"><label for="tdsi-ded">Date TDS was actually deducted</label><input id="tdsi-ded" type="date" value="2026-08-10"></div>
+<div class="field"><label for="tdsi-paid">Date TDS was paid to the government</label><input id="tdsi-paid" type="date" value="2026-10-05"></div>
+<div class="field"><label for="tdsi-sdue">TDS statement due date</label><input id="tdsi-sdue" type="date" value="2026-10-31"></div>
+<div class="field"><label for="tdsi-sfil">Date statement filed</label><input id="tdsi-sfil" type="date" value="2026-11-20"></div>
+<div class="field"><label for="tdsi-qtds">Total TDS in the statement (₹, caps the late fee)</label><input id="tdsi-qtds" type="number" inputmode="decimal" min="0" value="10000"></div>
+</form>
+<div><div class="result" id="tdsi-out" aria-live="polite"></div><p class="small muted" style="margin-top:12px">Part of a month counts as a full month; months are counted as calendar months. Penalty under section 461 (₹10,000 to ₹1 lakh) may apply separately.</p>
+<p class="small"><a href="templates/tds-calculator-excel.html">Download the Excel TDS register with interest</a></p></div>
 </div></div>
 
 </div>
