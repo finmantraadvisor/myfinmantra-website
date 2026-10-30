@@ -296,3 +296,9 @@ textarea{min-height:120px;resize:vertical}
 .dl-box{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-lg);padding:22px;margin-bottom:8px}
 .tpl-card .tpl-dl{margin-top:14px;font-weight:600;color:var(--ink-3);font-size:.93rem}
 .tpl-card:hover .tpl-dl{text-decoration:underline}
+/* popular service tiles */
+.tiles .tile{display:flex;flex-direction:column;gap:6px;text-decoration:none;color:inherit;border-left:4px solid var(--gold,#E3A21A);transition:transform .15s,box-shadow .15s}
+.tiles .tile h3{margin:0;font-size:1.12rem}
+.tiles .tile p{margin:0;color:var(--muted,#5b6b70);font-size:.95rem}
+.tiles .tile .more{margin-top:auto;padding-top:8px}
+.tiles .tile:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(15,46,53,.10)}
