@@ -241,18 +241,40 @@
     ti.addEventListener("input", runTi); runTi();
   }
 
-  /* ---------- Enquiry form → WhatsApp ---------- */
+  /* ---------- Enquiry form → email (FormSubmit) + WhatsApp fallback ---------- */
+  var MAILTO = "connect@myfinmantra.com";
   $$("form[data-enquiry]").forEach(function (f) {
+    var status = $(".form-status", f), btn = $("button[type=submit]", f);
     f.addEventListener("submit", function (ev) {
       ev.preventDefault();
       if ($(".hp input", f) && $(".hp input", f).value) return;
       var v = function (n) { var el = f.elements[n]; return el ? el.value.trim() : ""; };
-      if (!v("name") || !v("phone")) { $(".form-status", f).textContent = "Please add your name and phone number."; return; }
+      if (!v("name") || !v("phone")) { status.textContent = "Please add your name and phone number."; return; }
       var msg = "Hello MyFinMantra, I'd like a consultation.\n\nName: " + v("name") + "\nPhone: " + v("phone") +
         (v("email") ? "\nEmail: " + v("email") : "") + (v("service") ? "\nService: " + v("service") : "") +
         (v("city") ? "\nCity: " + v("city") : "") + (v("message") ? "\n\n" + v("message") : "");
-      $(".form-status", f).textContent = "Opening WhatsApp with your details…";
-      window.open("https://wa.me/" + WA + "?text=" + encodeURIComponent(msg), "_blank", "noopener");
+      var waUrl = "https://wa.me/" + WA + "?text=" + encodeURIComponent(msg);
+      var data = { name: v("name"), phone: v("phone"), email: v("email") || "(not given)", service: v("service"),
+        city: v("city") || "(not given)", message: v("message") || "(none)", page: location.href,
+        _subject: "New website enquiry: " + v("name") + " – " + (v("service") || "MyFinMantra"),
+        _template: "table", _captcha: "false" };
+      if (v("email")) data._replyto = v("email");
+      btn.disabled = true; status.textContent = "Sending your enquiry…";
+      fetch("https://formsubmit.co/ajax/" + MAILTO, {
+        method: "POST", headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify(data)
+      }).then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+        .then(function (res) {
+          if (res.ok && String(res.j.success) === "true") {
+            f.reset();
+            status.innerHTML = "Thank you! We've received your enquiry and will reply within one working day. " +
+              'Need it faster? <a href="' + waUrl + '" target="_blank" rel="noopener">Message us on WhatsApp</a>.';
+          } else { throw new Error("send failed"); }
+        })
+        .catch(function () {
+          status.innerHTML = 'We couldn\'t send it just now. <a href="' + waUrl + '" target="_blank" rel="noopener">Tap here to send it on WhatsApp</a> or call +91 97118 99555.';
+        })
+        .then(function () { btn.disabled = false; });
     });
   });
 })();
